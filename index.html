@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🌿 Eco Guardian | Save Our Planet – 5 Stage Quest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #cfe0d2;
+        }
+
+        .nature-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(1.02) saturate(1.02);
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(210, 230, 200, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        .slider {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 80px 20px 40px; /* extra top padding to avoid nav bar overlap */
+            scrollbar-width: thin;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* Stage navigation bar – fixed at top, no overlap because slide has padding-top */
+        .stage-nav {
+            position: fixed;
+            top: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 20;
+            flex-wrap: wrap;
+            padding: 10px 24px;
+            background: rgba(45, 70, 45, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            width: fit-content;
+            margin: 0 auto;
+            border: 1px solid rgba(220, 240, 180, 0.7);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stage-nav-btn {
+            background: rgba(255,255,220,0.2);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #fef5cf;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .stage-nav-btn:hover {
+            background: #e9c46a;
+            color: #2c5a3a;
+        }
+        .stage-nav-btn.completed {
+            background: #86b18e;
+            color: white;
+            text-decoration: underline;
+        }
+        .stage-nav-btn.active-stage {
+            background: #e9c46a;
+            color: #2c5a3a;
+            box-shadow: 0 0 8px #f9e0a0;
+        }
+
+        /* COVER – larger rectangular, light green pleasant color */
+        .cover-card {
+            background: linear-gradient(135deg, #d9f0cf, #c2e0b8);
+            border-radius: 48px;
+            border: 1px solid rgba(255, 245, 200, 0.8);
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.2);
+            max-width: 1000px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 55px 40px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .cover-card:hover {
+            transform: scale(1.01);
+        }
+        .globe-icon {
+            font-size: 5.5rem;
+            color: #4c7a5a;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.15));
+            animation: float 3s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: #2a5a3a;
+            text-shadow: 2px 2px 6px rgba(255,255,200,0.6);
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+        .cover-sub {
+            font-size: 1.3rem;
+            color: #3b6048;
+            font-weight: 500;
+            margin-bottom: 32px;
+        }
+        .btn-start-cover {
+            background: linear-gradient(105deg, #e9c46a, #f0d57e);
+            border: none;
+            padding: 16px 44px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 60px;
+            color: #2c5a3a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .btn-start-cover:hover {
+            background: linear-gradient(105deg, #f5d98f, #ffe1a0);
+            box-shadow: 0 0 18px #f9e0a0, 0 8px 20px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+        .cover-badge {
+            display: inline-block;
+            background: rgba(90, 130, 80, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2a5a3a;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* Glass card with pleasant green gradient for tasks */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(215, 240, 200, 0.92), rgba(195, 225, 180, 0.92));
+            backdrop-filter: blur(8px);
+            border-radius: 56px;
+            box-shadow: 0 20px 35px rgba(40, 60, 30, 0.2);
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 28px 32px;
+            border: 1px solid rgba(220, 245, 200, 0.9);
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: #2a6043;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        /* Lead story – larger font size */
+        .lead-story {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            line-height: 1.55;
+            color: #2c4a2e;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .lead-story p {
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-start, .btn-next, .btn-secondary {
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .btn-start, .btn-next {
+            background: linear-gradient(105deg, #86b18e, #6f9a7a);
+            color: #1e3a2a;
+        }
+        .btn-start:hover, .btn-next:hover {
+            background: linear-gradient(105deg, #9bc9a4, #80ad8a);
+            box-shadow: 0 0 12px #b9e0c4;
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: linear-gradient(105deg, #9bbb9f, #86a68a);
+            color: #1e3a2a;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(105deg, #b3d0b8, #9cbaa0);
+            box-shadow: 0 0 10px #c8e2cf;
+        }
+
+        /* drag & drop blanks */
+        .text-with-blanks {
+            background: #fef9e8;
+            padding: 24px;
+            border-radius: 44px;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .blank {
+            background: #fff0d0;
+            border: 2px dashed #7cb086;
+            border-radius: 60px;
+            padding: 4px 14px;
+            display: inline-block;
+            min-width: 140px;
+            margin: 0 4px;
+            font-weight: 500;
+        }
+        .blank.filled {
+            background: #d9f0df;
+            border: 2px solid #5f9e72;
+        }
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+        .drag-word {
+            background: #ebddbc;
+            padding: 8px 20px;
+            border-radius: 60px;
+            cursor: grab;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .drag-word.hidden-word { display: none; }
+
+        /* matching */
+        .match-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin: 20px 0;
+        }
+        .match-col {
+            flex: 1;
+            background: #fafff5;
+            border-radius: 36px;
+            padding: 18px;
+        }
+        .match-item {
+            background: white;
+            margin: 12px 0;
+            padding: 12px 18px;
+            border-radius: 80px;
+            border: 1px solid #cbe2cd;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .match-item.selected {
+            background: #c6ecd3;
+            border: 2px solid #6aa27a;
+        }
+        .match-item.matched {
+            background: #ddebe1;
+            text-decoration: line-through;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* sorting game */
+        .sorting-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+        .bin {
+            background: #ecf5e5;
+            border-radius: 48px;
+            padding: 16px;
+            width: 170px;
+            text-align: center;
+            border: 2px solid #a8c9a3;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+        .bin h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #2d5a3b;
+        }
+        .bin-items {
+            flex: 1;
+            min-height: 180px;
+            background: rgba(250, 250, 235, 0.7);
+            border-radius: 32px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .bin-item {
+            background: #fff9e8;
+            padding: 4px 8px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .waste-items-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            background: #f9f2df;
+            padding: 20px;
+            border-radius: 48px;
+        }
+        .waste-drag {
+            background: #ffe2b5;
+            padding: 8px 18px;
+            border-radius: 60px;
+            cursor: grab;
+            font-weight: 500;
+            user-select: none;
+        }
+        .waste-drag:active { cursor: grabbing; }
+        .waste-drag.hidden-waste { display: none; }
+
+        textarea {
+            width: 100%;
+            border-radius: 32px;
+            padding: 14px;
+            border: 2px solid #c1dfc1;
+            font-family: inherit;
+        }
+        .feedback {
+            background: #ecf7ea;
+            border-radius: 40px;
+            padding: 12px 20px;
+            margin: 18px 0;
+        }
+        .quotes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin: 20px 0;
+        }
+        .quote-card {
+            background: #fef7e0;
+            padding: 20px;
+            border-radius: 40px;
+            font-style: italic;
+            border-left: 8px solid #86b18e;
+        }
+        @media (max-width: 750px) {
+            .glass-card { padding: 20px; }
+            .bin { width: 140px; }
+            .cover-title { font-size: 2.4rem; }
+            .cover-card { padding: 35px 20px; width: 95%; }
+            .stage-nav { gap: 8px; padding: 6px 16px; }
+            .stage-nav-btn { padding: 4px 12px; font-size: 0.7rem; }
+            .slide { padding-top: 70px; }
+            .lead-story { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+<img class="nature-bg" src="background.png" alt="Forest" onerror="this.style.display='none'; document.querySelector('.overlay').style.backgroundColor='rgba(180, 210, 170, 0.5)'">
+<div class="overlay"></div>
+
+<div class="slider" id="slider">
+    <!-- SLIDE 0: COVER (larger rectangular, light green) -->
+    <div class="slide" id="slideCover">
+        <div style="display: flex; align-items: center; justify-content: center; min-height: 85vh;">
+            <div class="cover-card">
+                <div class="cover-badge"><i class="fas fa-leaf"></i> B1 EARTH GUARDIAN EDITION</div>
+                <div class="globe-icon"><i class="fas fa-globe-americas"></i></div>
+                <h1 class="cover-title">SAVE OUR PLANET</h1>
+                <div class="cover-sub">A 5‑Stage Eco Quest for Heroes</div>
+                <button id="startFromCoverBtn" class="btn-start-cover"><i class="fas fa-play"></i> BEGIN JOURNEY <i class="fas fa-seedling"></i></button>
+                <div style="margin-top: 32px; font-size: 0.85rem; color: #3b6048;">🌱 Reduce · Reuse · Recycle · Think globally, act locally</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 1: LEAD STORY (larger font) -->
+    <div class="slide" id="slideLead">
+        <div class="glass-card" style="max-width: 1000px; display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+            <div class="lead-story">
+                <p><strong>A whisper travels through the ancient forests, across melting ice caps, and into your heart.</strong> The Earth is calling. Oceans choke on plastic, the air grows thick with poison, and creatures vanish forever. But there is hope — and you are that hope.</p>
+                <p>Your mission is clear: restore knowledge by completing the eco‑text, master green vocabulary, sort waste like a true guardian, invent real solutions, and reflect on the wisdom of those who came before.</p>
+                <p>Five challenges stand between you and a thriving planet. Each stage you complete brings us closer to harmony. The journey starts now.</p>
+                <button id="startMissionBtn" class="btn-start" style="margin-top: 20px;"><i class="fas fa-seedling"></i> ACCEPT MISSION</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 1 -->
+    <div class="slide" id="slideStage1">
+        <div class="glass-card">
+            <h2>📝 STAGE 1: Complete the Earth's story</h2>
+            <div class="text-with-blanks" id="fillText">
+                Our beautiful planet is in danger. ____________ is causing temperatures to rise, leading to ____________ and extreme weather. ____________ from factories and vehicles harms our lungs and contributes to acid rain. The buildup of ____________ traps heat, accelerating climate change. Meanwhile, ____________ fills our oceans with toxic waste, killing marine life. To protect the future, we must shift to ____________ such as solar and wind. We should ____________ by walking, biking, or using electric transport. Protecting forests means we ____________, because trees absorb carbon dioxide. Every person can ____________ by choosing reusable products. Finally, ____________ helps turn old materials into new resources, saving energy. Together, we can heal the Earth — one action at a time.
+            </div>
+            <div class="word-pool" id="wordsPool"></div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;">
+                <button id="resetStage1Btn" class="btn-secondary"><i class="fas fa-undo-alt"></i> Reset Words</button>
+                <div id="stage1Feedback" class="feedback" style="flex:1; margin:0 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 2 -->
+    <div class="slide" id="slideStage2">
+        <div class="glass-card">
+            <h2>🔗 STAGE 2: Match the green terms</h2>
+            <p>Click a word (left) then a definition (right).</p>
+            <div class="match-grid">
+                <div class="match-col"><h3>ECO TERMS</h3><div id="wordsList"></div></div>
+                <div class="match-col"><h3>DEFINITIONS</h3><div id="defsList"></div></div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;">
+                <button id="resetMatchBtn" class="btn-secondary">Reset Matching</button>
+                <div id="stage2Feedback" class="feedback" style="flex:1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 3 -->
+    <div class="slide" id="slideStage3">
+        <div class="glass-card">
+            <h2>♻️ STAGE 3: Sort the waste</h2>
+            <p>Drag each item into the correct recycling bin.</p>
+            <div class="sorting-area" id="binsContainer"></div>
+            <div class="waste-items-pool" id="wastePool"></div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 20px;">
+                <button id="resetSortingBtn" class="btn-secondary">Reset Sorting</button>
+                <div id="stage3Feedback" class="feedback" style="flex:1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 4 -->
+    <div class="slide" id="slideStage4">
+        <div class="glass-card">
+            <h2>💡 STAGE 4: Your solution for the planet</h2>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+                <div class="problem-card" style="background:#fffaf0; border-radius: 28px; padding: 16px; flex:1;"><i class="fas fa-fish"></i> <strong>Ocean plastic</strong> – millions of tons choke marine life.</div>
+                <div class="problem-card" style="background:#fffaf0; border-radius: 28px; padding: 16px; flex:1;"><i class="fas fa-tree"></i> <strong>Deforestation</strong> – forests disappear, CO₂ rises.</div>
+                <div class="problem-card" style="background:#fffaf0; border-radius: 28px; padding: 16px; flex:1;"><i class="fas fa-smog"></i> <strong>Air pollution</strong> – fossil fuels harm health.</div>
+            </div>
+            <p>Write a short solution (3‑5 sentences) using at least 3 eco‑vocabulary words. Any thoughtful answer is accepted.</p>
+            <textarea id="solutionArea" rows="3" placeholder="Example: To reduce ocean plastic, we should ban single-use plastics, promote reusable bags, and organise community cleanups. Go green and think globally, act locally!"></textarea>
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 16px;">
+                <button id="submitSolutionBtn" class="btn-start">Submit Solution</button>
+                <div id="stage4Feedback" class="feedback" style="flex:1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 5 -->
+    <div class="slide" id="slideStage5">
+        <div class="glass-card">
+            <h2>🌱 STAGE 5: Wisdom for the future</h2>
+            <div class="quotes-container">
+                <div class="quote-card">“We do not inherit the earth from our ancestors; we borrow it from our children.” — Native American proverb</div>
+                <div class="quote-card">“The greatest threat to our planet is the belief that someone else will save it.” — Robert Swan</div>
+                <div class="quote-card">“Small acts, when multiplied by millions of people, can change the world.” — Howard Zinn</div>
+                <div class="quote-card">“The Earth does not belong to us. We belong to the Earth.” — Chief Seattle</div>
+                <div class="quote-card">“Every day you make a choice: does your life make the world better or worse?” — Unknown</div>
+            </div>
+            <p style="margin: 20px 0;"><strong>Reflect:</strong> Which quote inspires you the most? How will you change one habit after this quest?</p>
+            <button id="finishQuestBtn" class="btn-start" style="background: #e9c46a;"><i class="fas fa-trophy"></i> Complete & Save Planet</button>
+            <div id="stage5Feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- FINAL CELEBRATION -->
+    <div class="slide" id="slideFinal">
+        <div class="glass-card" style="text-align: center;">
+            <i class="fas fa-globe-europe" style="font-size: 5rem; color: #4c7a5a;"></i>
+            <h2>🏆 YOU SAVED THE PLANET! 🏆</h2>
+            <p style="font-size: 1.2rem;">Your knowledge, creativity, and determination have made a difference. The Earth breathes again. Carry these green habits forward, and inspire others. Together we thrive! 🌍💚</p>
+            <button id="restartButton" class="btn-start" style="background:#e9c46a; margin-top:20px;">Play Again</button>
+        </div>
+    </div>
+</div>
+
+<!-- Stage navigation bar (always visible, does not overlap due to slide padding) -->
+<div class="stage-nav" id="stageNav">
+    <button class="stage-nav-btn" data-stage="1">📝 Stage 1</button>
+    <button class="stage-nav-btn" data-stage="2">🔗 Stage 2</button>
+    <button class="stage-nav-btn" data-stage="3">♻️ Stage 3</button>
+    <button class="stage-nav-btn" data-stage="4">💡 Stage 4</button>
+    <button class="stage-nav-btn" data-stage="5">🌱 Stage 5</button>
+</div>
+
+<script>
+    // ---------- STAGE 1 ----------
+    const expectedWords = [
+        "global warming", "melting polar ice caps", "air pollution", "greenhouse gases", "water pollution",
+        "renewable energy", "reduce fossil fuels", "protect forests", "go green", "recycling"
+    ];
+    const wordItems = [
+        { display: "global warming", value: "global warming" },
+        { display: "melting polar ice caps", value: "melting polar ice caps" },
+        { display: "air pollution", value: "air pollution" },
+        { display: "greenhouse gases", value: "greenhouse gases" },
+        { display: "water pollution", value: "water pollution" },
+        { display: "renewable energy", value: "renewable energy" },
+        { display: "reduce fossil fuels", value: "reduce fossil fuels" },
+        { display: "protect forests", value: "protect forests" },
+        { display: "go green", value: "go green" },
+        { display: "recycling", value: "recycling" }
+    ];
+
+    let blanksArray = [];
+    let stage1Completed = false, stage2Completed = false, stage3Completed = false, stage4Completed = false, stage5Completed = false;
+    const slides = document.querySelectorAll('.slide');
+    function showSlide(index) { slides.forEach((s, i) => { if(i===index) s.classList.add('active'); else s.classList.remove('active'); }); updateNavActive(); }
+
+    function updateNavActive() {
+        const activeSlideId = document.querySelector('.slide.active')?.id;
+        let stageNum = 0;
+        if (activeSlideId === 'slideStage1') stageNum = 1;
+        else if (activeSlideId === 'slideStage2') stageNum = 2;
+        else if (activeSlideId === 'slideStage3') stageNum = 3;
+        else if (activeSlideId === 'slideStage4') stageNum = 4;
+        else if (activeSlideId === 'slideStage5') stageNum = 5;
+        document.querySelectorAll('.stage-nav-btn').forEach(btn => {
+            const s = parseInt(btn.dataset.stage);
+            btn.classList.remove('active-stage');
+            if (s === stageNum) btn.classList.add('active-stage');
+        });
+    }
+
+    function updateNavCompletion() {
+        const completions = {1: stage1Completed, 2: stage2Completed, 3: stage3Completed, 4: stage4Completed, 5: stage5Completed};
+        document.querySelectorAll('.stage-nav-btn').forEach(btn => {
+            const s = parseInt(btn.dataset.stage);
+            if (completions[s]) btn.classList.add('completed');
+            else btn.classList.remove('completed');
+        });
+    }
+
+    function checkAllCompleted() {
+        if (stage1Completed && stage2Completed && stage3Completed && stage4Completed && stage5Completed) {
+            showSlide(7); // final celebration slide
+        }
+    }
+
+    function shuffleArray(arr) { for(let i=arr.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+    
+    // Stage 1 render
+    function renderWordPool() {
+        const poolDiv = document.getElementById('wordsPool');
+        const shuffled = shuffleArray([...wordItems]);
+        poolDiv.innerHTML = '';
+        shuffled.forEach(item => {
+            const dragDiv = document.createElement('div');
+            dragDiv.className = 'drag-word';
+            dragDiv.setAttribute('draggable', 'true');
+            dragDiv.setAttribute('data-word', item.value);
+            dragDiv.innerHTML = `<i class="fas fa-arrows-alt"></i> ${item.display}`;
+            poolDiv.appendChild(dragDiv);
+        });
+        attachDragEvents();
+    }
+    function buildBlanks() {
+        const container = document.getElementById('fillText');
+        let html = container.innerHTML;
+        let blankIndex = 0;
+        let newHtml = html.replace(/____________/g, () => `<span class="blank" id="blank_${blankIndex++}" data-expected="${expectedWords[blankIndex-1]}">_________</span>`);
+        container.innerHTML = newHtml;
+        blanksArray = [];
+        for(let i=0; i<expectedWords.length; i++) {
+            const span = document.getElementById(`blank_${i}`);
+            if(span) blanksArray.push({ element: span, expected: expectedWords[i], filled: false });
+        }
+    }
+    let draggedWordElem = null;
+    function dragStartHandler(e) { draggedWordElem = this; e.dataTransfer.setData('text/plain', this.getAttribute('data-word')); this.style.opacity='0.5'; }
+    function dragEndHandler(e) { if(this) this.style.opacity=''; draggedWordElem=null; }
+    function dragOverHandler(e) { e.preventDefault(); }
+    function dropHandler(e) {
+        e.preventDefault();
+        const targetBlank = e.target.closest('.blank');
+        if(!targetBlank || !draggedWordElem) return;
+        const wordValue = draggedWordElem.getAttribute('data-word');
+        const blankObj = blanksArray.find(b => b.element.id === targetBlank.id);
+        if(!blankObj || blankObj.filled) { showStage1Feedback(`❌ Already filled or wrong`, 'error'); return; }
+        if(wordValue !== blankObj.expected) { showStage1Feedback(`❌ "${wordValue}" doesn't fit.`, 'error'); return; }
+        blankObj.element.innerText = wordValue;
+        blankObj.element.classList.add('filled');
+        blankObj.filled = true;
+        draggedWordElem.classList.add('hidden-word');
+        draggedWordElem.setAttribute('draggable', 'false');
+        showStage1Feedback(`✅ Correct!`, 'success');
+        draggedWordElem = null;
+        checkStage1Completion();
+    }
+    function attachDragEvents() {
+        document.querySelectorAll('.drag-word').forEach(d => {
+            d.removeEventListener('dragstart', dragStartHandler); d.addEventListener('dragstart', dragStartHandler);
+            d.removeEventListener('dragend', dragEndHandler); d.addEventListener('dragend', dragEndHandler);
+        });
+        document.querySelectorAll('.blank').forEach(blank => {
+            blank.removeEventListener('dragover', dragOverHandler); blank.removeEventListener('drop', dropHandler);
+            blank.addEventListener('dragover', dragOverHandler); blank.addEventListener('drop', dropHandler);
+        });
+    }
+    function showStage1Feedback(msg, type) {
+        const fb = document.getElementById('stage1Feedback');
+        fb.innerHTML = `<div style="background:${type==='success'?'#daf1e0':'#ffe6cc'}; border-radius:28px; padding:8px;">${msg}</div>`;
+        if(type==='success') setTimeout(()=>{if(fb.innerHTML.includes(msg)) fb.innerHTML='';},1500);
+    }
+    function checkStage1Completion() {
+        const allFilled = blanksArray.every(b=>b.filled);
+        const hiddenCount = document.querySelectorAll('.drag-word.hidden-word').length;
+        if(allFilled && hiddenCount===expectedWords.length) {
+            if (!stage1Completed) {
+                stage1Completed = true;
+                document.getElementById('stage1Feedback').innerHTML = '<div style="background:#cbeada;">🎉 STAGE 1 COMPLETE!</div>';
+                updateNavCompletion();
+                checkAllCompleted();
+            }
+        } else {
+            if (stage1Completed) {
+                stage1Completed = false;
+                updateNavCompletion();
+            }
+        }
+    }
+    function resetStage1() {
+        document.querySelectorAll('.drag-word').forEach(w=>{ w.classList.remove('hidden-word'); w.setAttribute('draggable','true'); w.style.opacity=''; });
+        blanksArray.forEach(b=>{ b.element.innerText='_________'; b.element.classList.remove('filled'); b.filled=false; });
+        stage1Completed = false;
+        updateNavCompletion();
+        document.getElementById('stage1Feedback').innerHTML = '';
+        renderWordPool(); buildBlanks(); attachDragEvents();
+    }
+
+    // STAGE 2 matching
+    const baseMatchItems = [
+        { word: "Carbon Footprint", def: "Total greenhouse gases produced by human activities." },
+        { word: "Go green", def: "Make eco-friendly choices to protect the environment." },
+        { word: "Green thumb", def: "Being skilled at growing healthy plants." },
+        { word: "Think globally, act locally", def: "Care about world problems but solve them in your neighborhood." },
+        { word: "Reduce, reuse, recycle", def: "Three rules: use less, use again, turn old into new." },
+        { word: "Global Warming", def: "Rise in Earth's temperature due to greenhouse gases." }
+    ];
+    let currentWordsOrder = [], currentDefsOrder = [];
+    let matchedWordsState = [], matchedDefsState = [];
+    let selectedType = null, selectedIndex = null;
+
+    function shuffleAndRenderMatching() {
+        currentWordsOrder = shuffleArray([...baseMatchItems.map(item => item.word)]);
+        currentDefsOrder = shuffleArray([...baseMatchItems.map(item => item.def)]);
+        matchedWordsState = new Array(6).fill(false);
+        matchedDefsState = new Array(6).fill(false);
+        selectedType = null; selectedIndex = null;
+        renderMatchingUI();
+    }
+    function renderMatchingUI() {
+        const wordsContainer = document.getElementById('wordsList');
+        const defsContainer = document.getElementById('defsList');
+        wordsContainer.innerHTML = '';
+        defsContainer.innerHTML = '';
+        currentWordsOrder.forEach((word, idx) => {
+            const wDiv = document.createElement('div');
+            wDiv.className = `match-item ${matchedWordsState[idx] ? 'matched' : ''}`;
+            wDiv.innerHTML = `<i class="fas fa-leaf"></i> ${word}`;
+            wDiv.dataset.index = idx;
+            wDiv.dataset.type = 'word';
+            wDiv.addEventListener('click', () => onMatchClick('word', idx));
+            wordsContainer.appendChild(wDiv);
+        });
+        currentDefsOrder.forEach((def, idx) => {
+            const dDiv = document.createElement('div');
+            dDiv.className = `match-item ${matchedDefsState[idx] ? 'matched' : ''}`;
+            dDiv.innerHTML = `<i class="fas fa-quote-right"></i> ${def}`;
+            dDiv.dataset.index = idx;
+            dDiv.dataset.type = 'def';
+            dDiv.addEventListener('click', () => onMatchClick('def', idx));
+            defsContainer.appendChild(dDiv);
+        });
+    }
+    function clearHighlight() { document.querySelectorAll('.match-item.selected').forEach(el => el.classList.remove('selected')); }
+    function onMatchClick(type, idx) {
+        if ((type === 'word' && matchedWordsState[idx]) || (type === 'def' && matchedDefsState[idx])) return;
+        if (selectedType === null) {
+            selectedType = type; selectedIndex = idx; clearHighlight();
+            const selector = type === 'word' ? '#wordsList .match-item' : '#defsList .match-item';
+            const items = document.querySelectorAll(selector);
+            if (items[idx]) items[idx].classList.add('selected');
+        } else {
+            if (selectedType === type) { clearHighlight(); selectedType = null; selectedIndex = null; return; }
+            let wordIdx, defIdx;
+            if (selectedType === 'word' && type === 'def') { wordIdx = selectedIndex; defIdx = idx; }
+            else if (selectedType === 'def' && type === 'word') { wordIdx = idx; defIdx = selectedIndex; }
+            else { clearHighlight(); selectedType = null; selectedIndex = null; return; }
+            const selectedWord = currentWordsOrder[wordIdx];
+            const selectedDef = currentDefsOrder[defIdx];
+            const originalPair = baseMatchItems.find(p => p.word === selectedWord);
+            if (originalPair && originalPair.def === selectedDef) {
+                if (!matchedWordsState[wordIdx] && !matchedDefsState[defIdx]) {
+                    matchedWordsState[wordIdx] = true;
+                    matchedDefsState[defIdx] = true;
+                    document.getElementById('stage2Feedback').innerHTML = '<div style="background:#d0f0da;">✔️ Perfect match!</div>';
+                    setTimeout(() => { if (document.getElementById('stage2Feedback').innerHTML.includes('Perfect')) document.getElementById('stage2Feedback').innerHTML = ''; }, 1200);
+                } else { document.getElementById('stage2Feedback').innerHTML = '<div>⚠️ Already matched!</div>'; }
+            } else {
+                document.getElementById('stage2Feedback').innerHTML = '<div style="background:#ffe0b5;">❌ Wrong combination. Try again.</div>';
+            }
+            clearHighlight(); selectedType = null; selectedIndex = null;
+            renderMatchingUI();
+            checkStage2Completion();
+        }
+    }
+    function checkStage2Completion() {
+        const allMatched = matchedWordsState.every(v => v) && matchedDefsState.every(v => v);
+        if (allMatched) {
+            if (!stage2Completed) {
+                stage2Completed = true;
+                document.getElementById('stage2Feedback').innerHTML = '<div style="background:#d0f0da;">✨ STAGE 2 COMPLETE!</div>';
+                updateNavCompletion();
+                checkAllCompleted();
+            }
+        } else {
+            if (stage2Completed) {
+                stage2Completed = false;
+                updateNavCompletion();
+            }
+        }
+    }
+    function resetMatchingGame() {
+        shuffleAndRenderMatching();
+        stage2Completed = false;
+        updateNavCompletion();
+        document.getElementById('stage2Feedback').innerHTML = '';
+    }
+
+    // STAGE 3 sorting
+    const wasteCategories = {
+        plastic: ["plastic bottle", "yogurt cup", "plastic bag", "straw", "bubble wrap"],
+        paper: ["newspaper", "cardboard box", "magazine", "egg carton", "paper bag"],
+        metal: ["aluminum can", "steel lid", "tin foil", "metal spoon", "bicycle chain"],
+        glass: ["glass jar", "wine bottle", "glass cup", "broken mirror", "perfume bottle"],
+        ewaste: ["old phone", "laptop battery", "charger", "broken headphones", "USB cable"],
+        organic: ["banana peel", "apple core", "coffee grounds", "egg shell", "leftover bread"]
+    };
+    let remainingWaste = [];
+    let binsData = { plastic: [], paper: [], metal: [], glass: [], ewaste: [], organic: [] };
+    const binEmojis = { plastic: "🥤", paper: "📰", metal: "🥫", glass: "🍾", ewaste: "🔌", organic: "🍌" };
+
+    function buildSortingGame() {
+        const binsContainer = document.getElementById('binsContainer');
+        binsContainer.innerHTML = '';
+        const binNames = ['plastic', 'paper', 'metal', 'glass', 'ewaste', 'organic'];
+        binNames.forEach(bin => {
+            const binDiv = document.createElement('div');
+            binDiv.className = 'bin';
+            binDiv.setAttribute('data-bin', bin);
+            binDiv.innerHTML = `<h3>${binEmojis[bin]} ${bin.toUpperCase()}</h3><div class="bin-items" id="bin-${bin}"></div>`;
+            binsContainer.appendChild(binDiv);
+        });
+        refreshWasteUI();
+        attachWasteDropZones();
+    }
+    function refreshWasteUI() {
+        const poolDiv = document.getElementById('wastePool');
+        poolDiv.innerHTML = '';
+        const shuffledRemaining = shuffleArray([...remainingWaste]);
+        shuffledRemaining.forEach(item => {
+            const drag = document.createElement('div');
+            drag.className = 'waste-drag';
+            drag.setAttribute('draggable', 'true');
+            drag.setAttribute('data-waste', item);
+            drag.textContent = item;
+            drag.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', item); drag.style.opacity = '0.5'; });
+            drag.addEventListener('dragend', e => { drag.style.opacity = ''; });
+            poolDiv.appendChild(drag);
+        });
+        for (let bin in binsData) {
+            const binContainer = document.getElementById(`bin-${bin}`);
+            if (binContainer) {
+                binContainer.innerHTML = '';
+                binsData[bin].forEach(item => {
+                    const span = document.createElement('div');
+                    span.className = 'bin-item';
+                    span.textContent = item;
+                    binContainer.appendChild(span);
+                });
+            }
+        }
+    }
+    function attachWasteDropZones() {
+        document.querySelectorAll('.bin').forEach(bin => {
+            bin.removeEventListener('dragover', dragOverWaste);
+            bin.removeEventListener('drop', dropWaste);
+            bin.addEventListener('dragover', dragOverWaste);
+            bin.addEventListener('drop', dropWaste);
+        });
+    }
+    function dragOverWaste(e) { e.preventDefault(); }
+    function dropWaste(e) {
+        e.preventDefault();
+        const wasteItem = e.dataTransfer.getData('text/plain');
+        const targetBin = e.target.closest('.bin')?.getAttribute('data-bin');
+        if (!wasteItem || !targetBin) return;
+        let category = null;
+        for (let cat in wasteCategories) {
+            if (wasteCategories[cat].includes(wasteItem)) { category = cat; break; }
+        }
+        if (category === targetBin) {
+            const idx = remainingWaste.indexOf(wasteItem);
+            if (idx !== -1) remainingWaste.splice(idx, 1);
+            binsData[targetBin].push(wasteItem);
+            refreshWasteUI();
+            checkStage3Completion();
+        } else {
+            document.getElementById('stage3Feedback').innerHTML = '<div style="background:#ffe0b5;">❌ Wrong bin! Try again.</div>';
+            setTimeout(() => { if (document.getElementById('stage3Feedback').innerHTML.includes('Wrong')) document.getElementById('stage3Feedback').innerHTML = ''; }, 1000);
+        }
+    }
+    function resetSorting() {
+        remainingWaste = [];
+        for (let cat in wasteCategories) { remainingWaste.push(...wasteCategories[cat]); }
+        binsData = { plastic: [], paper: [], metal: [], glass: [], ewaste: [], organic: [] };
+        refreshWasteUI();
+        attachWasteDropZones();
+        stage3Completed = false;
+        updateNavCompletion();
+        document.getElementById('stage3Feedback').innerHTML = '';
+    }
+    function checkStage3Completion() {
+        const totalItems = Object.values(wasteCategories).flat().length;
+        const sortedCount = Object.values(binsData).flat().length;
+        if (sortedCount === totalItems) {
+            if (!stage3Completed) {
+                stage3Completed = true;
+                document.getElementById('stage3Feedback').innerHTML = '<div style="background:#cbeada;">🎉 Perfect sorting! Stage 3 complete.</div>';
+                updateNavCompletion();
+                checkAllCompleted();
+            }
+        } else {
+            if (stage3Completed) {
+                stage3Completed = false;
+                updateNavCompletion();
+            }
+        }
+    }
+
+    // Stage 4 solution
+    function submitSolution() {
+        const solution = document.getElementById('solutionArea').value.trim();
+        if (solution === "") { document.getElementById('stage4Feedback').innerHTML = '<div>📝 Write your solution first.</div>'; return; }
+        if (!stage4Completed) {
+            stage4Completed = true;
+            document.getElementById('stage4Feedback').innerHTML = '<div style="background:#d9f0e0;">✅ Great solution! Stage 4 complete.</div>';
+            updateNavCompletion();
+            checkAllCompleted();
+        } else {
+            document.getElementById('stage4Feedback').innerHTML = '<div>Solution already submitted. You can edit and submit again if you wish.</div>';
+        }
+    }
+
+    // Stage 5 completion
+    function completeStage5() {
+        if (!stage5Completed) {
+            stage5Completed = true;
+            document.getElementById('stage5Feedback').innerHTML = '<div style="background:#d9f0e0;">🌟 Thank you for reflecting! Stage 5 complete.</div>';
+            updateNavCompletion();
+            checkAllCompleted();
+        } else {
+            document.getElementById('stage5Feedback').innerHTML = '<div>You already completed this stage. Great wisdom!</div>';
+        }
+    }
+
+    // Navigation and initialization
+    document.getElementById('startFromCoverBtn').addEventListener('click', () => showSlide(1));
+    document.getElementById('startMissionBtn').addEventListener('click', () => showSlide(2));
+    document.querySelectorAll('.stage-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stage = parseInt(btn.dataset.stage);
+            if (stage === 1) showSlide(2);
+            else if (stage === 2) showSlide(3);
+            else if (stage === 3) showSlide(4);
+            else if (stage === 4) showSlide(5);
+            else if (stage === 5) showSlide(6);
+        });
+    });
+    document.getElementById('resetStage1Btn').addEventListener('click', resetStage1);
+    document.getElementById('resetMatchBtn').addEventListener('click', resetMatchingGame);
+    document.getElementById('resetSortingBtn').addEventListener('click', resetSorting);
+    document.getElementById('submitSolutionBtn').addEventListener('click', submitSolution);
+    document.getElementById('finishQuestBtn').addEventListener('click', completeStage5);
+    document.getElementById('restartButton').addEventListener('click', () => {
+        resetStage1();
+        resetMatchingGame();
+        resetSorting();
+        stage1Completed = false; stage2Completed = false; stage3Completed = false; stage4Completed = false; stage5Completed = false;
+        updateNavCompletion();
+        document.getElementById('solutionArea').value = '';
+        document.getElementById('stage4Feedback').innerHTML = '';
+        document.getElementById('stage5Feedback').innerHTML = '';
+        showSlide(0);
+    });
+
+    // Initial render
+    renderWordPool(); buildBlanks(); attachDragEvents();
+    shuffleAndRenderMatching();
+    buildSortingGame();
+    updateNavCompletion();
+    // start from cover
+    showSlide(0);
+</script>
+</body>
+</html>
